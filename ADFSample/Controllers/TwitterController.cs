@@ -48,7 +48,7 @@ namespace ADFSample
         private HttpResponseMessage CreateAcceptedMessage(Guid id)
         {
             HttpResponseMessage responseMessage = new HttpResponseMessage(HttpStatusCode.Accepted);
-            responseMessage.Headers.Location = new Uri(String.Format(CultureInfo.InvariantCulture, "{0}://{1}/api/Twitter/status/{2}", Request.RequestUri.Scheme, Request.RequestUri.Host, id));
+            responseMessage.Headers.Location = new Uri(String.Format(CultureInfo.InvariantCulture, "{0}://{1}/api/Twitter/CheckStatus/{2}", Request.RequestUri.Scheme, Request.RequestUri.Host, id));
             responseMessage.Headers.RetryAfter = new RetryConditionHeaderValue(TimeSpan.FromSeconds(10));
             return responseMessage;
         }
