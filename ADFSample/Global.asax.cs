@@ -11,7 +11,8 @@ namespace ADFSample
         {
             AreaRegistration.RegisterAllAreas();
             WebApiConfig.Register(GlobalConfiguration.Configuration);
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            // RouteConfig.RegisterRoutes(RouteTable.Routes);
+            GlobalConfiguration.Configuration.EnsureInitialized();
         }
     }
 }

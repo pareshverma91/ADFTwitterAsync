@@ -7,17 +7,17 @@ namespace ADFSample
     {
         public static void Register (HttpConfiguration config)
         {
-            //config.MapHttpAttributeRoutes();
+            config.MapHttpAttributeRoutes();
 
-            //config.Routes.MapHttpRoute(
-            //    name: "DefaultAPi",
-            //    routeTemplate: "api/{controller}/{action}/{id}",
-            //    defaults: new
-            //    {
-            //        id = RouteParameter.Optional,
-            //        action = "DefaultAction"
-            //    }
-            //);
+            config.Routes.MapHttpRoute(
+                name: "DefaultAPi",
+                routeTemplate: "api/{controller}/{action}/{id}",
+                defaults: new
+                {
+                    id = RouteParameter.Optional,
+                    action = "DefaultAction"
+                }
+            );
         }
     }
 }

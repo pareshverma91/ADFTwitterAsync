@@ -7,28 +7,25 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Web.Http;
-using System.Web.Mvc;
 
 namespace ADFSample
 {
-    // [RoutePrefix("api/Twitter")]
-    public class TwitterController : Controller
+    public class TwitterController : ApiController
     {
         private static Dictionary<Guid, HttpResponseMessage> runningTasks = new Dictionary<Guid, HttpResponseMessage>();
 
-        // [HttpPost]
-        public HttpResponseMessage ReadTwitter([FromBody] string input)
+        public HttpResponseMessage ReadTwitter(JObject input)
         {
-            JObject inputObject = JObject.Parse(input);
-
             Guid id = Guid.NewGuid();
             runningTasks[id] = null;
-            new Thread(() => DoWork(id, inputObject)).Start();
+            new Thread(() => DoWork(id, input)).Start();
 
             return this.CreateAcceptedMessage(id);
         }
 
-        // [HttpGet]
+        [HttpGet]
+        [ActionName("CheckStatus")]
+        [Route("CheckStatus/{id}")]
         public HttpResponseMessage CheckStatus(Guid id)
         {
             if (runningTasks.ContainsKey(id))
