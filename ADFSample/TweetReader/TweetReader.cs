@@ -1,5 +1,6 @@
 ﻿using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -14,39 +15,43 @@ using Tweetinvi.Core.Interfaces.Models.Parameters;
 
 namespace ADFSample.TweetReader
 {
-    public interface ITwitterLocation
+    public class TwitterLocation
     {
-        int? Limit { get; set; }
-        string Keywords { get; set; }
-        string SearchResultType { get; set; }
-        string Since { get; set; }
-        string Until { get; set; }
+        public int? Limit { get; set; }
+        public string Keywords { get; set; }
+        public string SearchResultType { get; set; }
+        public string Since { get; set; }
+        public string Until { get; set; }
     }
 
-    public interface ITwitterAccountInfo
+    public class TwitterAccountInfo
     {
-        string UserAccessToken { get; set; }
-        string UserAccessTokenSecret { get; set; }
-        string ConsumerKey { get; set; }
-        string ConsumerSecret { get; set; }
+        public string UserAccessToken { get; set; }
+        public string UserAccessTokenSecret { get; set; }
+        public string ConsumerKey { get; set; }
+        public string ConsumerSecret { get; set; }
     }
 
-    public interface IStorageAccountInfo
+    public class StorageAccountInfo
     {
-        string ConnectionString { get; set; }
-        string FolderPath { get; set; }
-        string FileName { get; set; }
+        public string ConnectionString { get; set; }
+        public string FolderPath { get; set; }
+        public string FileName { get; set; }
     }
 
-    public interface IExecutionInput
+    public class ExecutionInput
     {
-        ITwitterAccountInfo TwitterAccountInfo { get; set; }
-        ITwitterLocation TwitterLocation { get; set; }
-        IStorageAccountInfo StorageAccountInfo { get; set; }
+        public TwitterAccountInfo TwitterAccountInfo { get; set; }
+        public TwitterLocation TwitterLocation { get; set; }
+        public StorageAccountInfo StorageAccountInfo { get; set; }
     }
 
     public class TweetReaderActivity
     {
+        public TweetReaderActivity()
+        {
+        }
+
         public IDictionary<string, string> Execute(JObject inputObject)
         {
             if (inputObject == null)
@@ -54,7 +59,7 @@ namespace ADFSample.TweetReader
                 throw new Exception("No input defined.");
             }
 
-            IExecutionInput input = inputObject.ToObject<IExecutionInput>();
+            ExecutionInput input = inputObject.ToObject<ExecutionInput>();
             if (input == null)
             {
                 throw new Exception(string.Format(CultureInfo.InvariantCulture, "Input is not in expected format. {0}", inputObject.ToString()));
@@ -66,7 +71,7 @@ namespace ADFSample.TweetReader
             return null;
         }
 
-        private IEnumerable<ITweet> GetTweets(ITwitterAccountInfo twitterAccountInfo, ITwitterLocation twitterLocation)
+        private IEnumerable<ITweet> GetTweets(TwitterAccountInfo twitterAccountInfo, TwitterLocation twitterLocation)
         {
             string userAccessToken = twitterAccountInfo.UserAccessToken;
             string userAccessTokenSecret = twitterAccountInfo.UserAccessTokenSecret;
@@ -148,7 +153,7 @@ namespace ADFSample.TweetReader
             }
         }
 
-        private void UploadTweets(IStorageAccountInfo storageAccountInfo, IEnumerable<ITweet> tweets)
+        private void UploadTweets(StorageAccountInfo storageAccountInfo, IEnumerable<ITweet> tweets)
         {
             string tempFileName = Path.GetTempFileName();
             //logger.Write(TraceEventType.Information, "Writing tweets to file: {0}", tempFileName);

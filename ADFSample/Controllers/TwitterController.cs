@@ -41,7 +41,7 @@ namespace ADFSample
             }
             else
             {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
             }
         }
 
