@@ -11,11 +11,10 @@ namespace ADFSample
 
             config.Routes.MapHttpRoute(
                 name: "DefaultAPi",
-                routeTemplate: "api/{controller}/{action}/{id}",
+                routeTemplate: "api/{controller}/{id}",
                 defaults: new
                 {
-                    id = RouteParameter.Optional,
-                    action = "DefaultAction"
+                    id = RouteParameter.Optional
                 }
             );
         }

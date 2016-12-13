@@ -10,6 +10,7 @@ using System.Web.Http;
 
 namespace ADFSample
 {
+    [RoutePrefix("api/Twitter")]
     public class TwitterController : ApiController
     {
         private static Dictionary<Guid, HttpResponseMessage> runningTasks = new Dictionary<Guid, HttpResponseMessage>();
@@ -24,9 +25,8 @@ namespace ADFSample
         }
 
         [HttpGet]
-        [ActionName("CheckStatus")]
         [Route("CheckStatus/{id}")]
-        public HttpResponseMessage CheckStatus(Guid id)
+        public HttpResponseMessage CheckStatus([FromUri] Guid id)
         {
             if (runningTasks.ContainsKey(id))
             {
@@ -42,6 +42,13 @@ namespace ADFSample
             {
                 return new HttpResponseMessage(HttpStatusCode.BadRequest);
             }
+        }
+
+        [HttpGet]
+        [Route("Hello")]
+        public string Hello()
+        {
+            return "hello";
         }
 
         private HttpResponseMessage CreateAcceptedMessage(Guid id)
