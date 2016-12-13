@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -44,17 +45,10 @@ namespace ADFSample
             }
         }
 
-        [HttpGet]
-        [Route("Hello")]
-        public string Hello()
-        {
-            return "hello";
-        }
-
         private HttpResponseMessage CreateAcceptedMessage(Guid id)
         {
             HttpResponseMessage responseMessage = new HttpResponseMessage(HttpStatusCode.Accepted);
-            // responseMessage.Headers.Location = new Uri(String.Format(CultureInfo.InvariantCulture, "{0}://{1}/api/Twitter/status/{2}", Request.RequestUri.Scheme, Request.RequestUri.Host, id));
+            responseMessage.Headers.Location = new Uri(String.Format(CultureInfo.InvariantCulture, "{0}://{1}/api/Twitter/status/{2}", Request.RequestUri.Scheme, Request.RequestUri.Host, id));
             responseMessage.Headers.RetryAfter = new RetryConditionHeaderValue(TimeSpan.FromSeconds(10));
             return responseMessage;
         }
