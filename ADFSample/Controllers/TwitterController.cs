@@ -2,33 +2,33 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
+using System.Web.Http;
 using System.Web.Mvc;
 
-namespace ADFSample.Controllers
+namespace ADFSample
 {
-    [RoutePrefix("api/[controller]")]
+    // [RoutePrefix("api/Twitter")]
     public class TwitterController : Controller
     {
         private static Dictionary<Guid, HttpResponseMessage> runningTasks = new Dictionary<Guid, HttpResponseMessage>();
 
-        [HttpPost]
-        [Route("StartTwitter")]
-        public HttpResponseMessage StartTwitterTask(JObject input)
+        // [HttpPost]
+        public HttpResponseMessage ReadTwitter([FromBody] string input)
         {
+            JObject inputObject = JObject.Parse(input);
+
             Guid id = Guid.NewGuid();
             runningTasks[id] = null;
-            new Thread(() => DoWork(id, input)).Start();
+            new Thread(() => DoWork(id, inputObject)).Start();
 
             return this.CreateAcceptedMessage(id);
         }
 
-        [HttpGet]
-        [Route("CheckStatus/{id}")]
+        // [HttpGet]
         public HttpResponseMessage CheckStatus(Guid id)
         {
             if (runningTasks.ContainsKey(id))
@@ -50,7 +50,7 @@ namespace ADFSample.Controllers
         private HttpResponseMessage CreateAcceptedMessage(Guid id)
         {
             HttpResponseMessage responseMessage = new HttpResponseMessage(HttpStatusCode.Accepted);
-            responseMessage.Headers.Location = new Uri(String.Format(CultureInfo.InvariantCulture, "{0}://{1}/api/Twitter/status/{2}", Request.Url.Scheme, Request.Url.Host, id));
+            // responseMessage.Headers.Location = new Uri(String.Format(CultureInfo.InvariantCulture, "{0}://{1}/api/Twitter/status/{2}", Request.RequestUri.Scheme, Request.RequestUri.Host, id));
             responseMessage.Headers.RetryAfter = new RetryConditionHeaderValue(TimeSpan.FromSeconds(10));
             return responseMessage;
         }

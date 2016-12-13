@@ -1,14 +1,16 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Web.Http;
+using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace ADFSample
 {
-    public class MvcApplication : System.Web.HttpApplication
+    public class Global : System.Web.HttpApplication
     {
-        protected void Application_Start()
+        public void Application_Start(object sender, EventArgs e)
         {
             AreaRegistration.RegisterAllAreas();
-            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            WebApiConfig.Register(GlobalConfiguration.Configuration);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
         }
     }
