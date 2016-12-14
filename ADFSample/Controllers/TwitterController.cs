@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.Caching;
 using System.Threading;
 using System.Web.Http;
 
@@ -14,12 +15,15 @@ namespace ADFSample
     [RoutePrefix("api/Twitter")]
     public class TwitterController : ApiController
     {
-        private static Dictionary<Guid, HttpResponseMessage> runningTasks = new Dictionary<Guid, HttpResponseMessage>();
+        private static MemoryCache Cache = new MemoryCache("TwitterJobCache",
+            new System.Collections.Specialized.NameValueCollection { { "cacheMemoryLimitMegabytes", "10" } });
+
+        private const string Null = "null";
 
         public HttpResponseMessage ReadTwitter(JObject input)
         {
             Guid id = Guid.NewGuid();
-            runningTasks[id] = null;
+            Cache.Set(id.ToString(), Null, GetExpiryTime());
             new Thread(() => DoWork(id, input)).Start();
 
             return this.CreateAcceptedMessage(id);
@@ -29,15 +33,14 @@ namespace ADFSample
         [Route("CheckStatus/{id}")]
         public HttpResponseMessage CheckStatus([FromUri] Guid id)
         {
-            if (runningTasks.ContainsKey(id))
+            if (Cache.Contains(id.ToString()))
             {
-                HttpResponseMessage message = runningTasks[id];
-                if (message == null)
+                var message = Cache.GetCacheItem(id.ToString()).Value;
+                if (message.Equals(Null))
                 {
                     return this.CreateAcceptedMessage(id);
                 }
-                runningTasks.Remove(id);
-                return message;
+                return message as HttpResponseMessage;
             }
             else
             {
@@ -61,7 +64,7 @@ namespace ADFSample
                 reader.Execute(input);
 
                 HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
-                runningTasks[id] = message;
+                Cache.Set(id.ToString(), message, GetExpiryTime());
             }
             catch (Exception ex)
             {
@@ -69,8 +72,13 @@ namespace ADFSample
                 HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.BadRequest);
                 message.Content = new StringContent(ex.ToString());
 
-                runningTasks[id] = message;
+                Cache.Set(id.ToString(), message, GetExpiryTime());
             }
+        }
+
+        private DateTimeOffset GetExpiryTime()
+        {
+            return DateTime.UtcNow.Add(TimeSpan.FromMinutes(5));
         }
     }
 }
